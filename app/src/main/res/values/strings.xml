@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Screen Idle Shutdown</string>
+    <string name="service_running_title">Screen Idle Shutdown Active</string>
+    <string name="service_screen_on">Screen ON: Monitoring idle timeout…</string>
+    <string name="service_screen_off_countdown">Screen OFF: Shutting down in %s</string>
+    <string name="notification_channel_name">Screen State Monitoring</string>
+    <string name="notification_channel_desc">Shows active status and countdown timer when screen is off</string>
+    <string name="accessibility_service_description">Allows Screen Idle Shutdown to display the Power dialog and perform automatic shutdown without root access.</string>
+</resources>
