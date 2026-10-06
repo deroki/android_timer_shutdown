@@ -61,6 +61,9 @@ class ScreenShutdownViewModel(application: Application) : AndroidViewModel(appli
 
     init {
         checkPermissions()
+        viewModelScope.launch {
+            preferencesManager.setSimulationMode(false)
+        }
     }
 
     fun checkPermissions() {

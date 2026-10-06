@@ -101,7 +101,6 @@ fun ScreenShutdownApp(
     val hours by viewModel.hours.collectAsState()
     val minutes by viewModel.minutes.collectAsState()
     val seconds by viewModel.seconds.collectAsState()
-    val isSimulationMode by viewModel.isSimulationMode.collectAsState()
     val isServiceEnabledPref by viewModel.isServiceEnabledPref.collectAsState()
     val isServiceRunning by viewModel.isServiceRunning.collectAsState()
     val isScreenOff by viewModel.isScreenOff.collectAsState()
@@ -168,20 +167,11 @@ fun ScreenShutdownApp(
                 }
             )
 
-            // Simulation / Test Mode Card
-            SimulationModeCard(
-                isSimulationMode = isSimulationMode,
-                onToggleSimulation = { viewModel.setSimulationMode(it) },
-                onRun10sRealTest = { viewModel.setQuickRealTest10Seconds() },
-                onRun30sTest = { viewModel.setQuickTest30Seconds() }
-            )
-
             // Timer Picker Card (Hours and Minutes)
             TimeConfigurationCard(
                 hours = hours,
                 minutes = minutes,
                 seconds = seconds,
-                isSimulationMode = isSimulationMode,
                 onHoursChanged = {
                     viewModel.setSeconds(0)
                     viewModel.setHours(it)
@@ -190,15 +180,13 @@ fun ScreenShutdownApp(
                     viewModel.setSeconds(0)
                     viewModel.setMinutes(it)
                 },
-                onQuick10sRealTest = { viewModel.setQuickRealTest10Seconds() },
-                onQuick30sTest = { viewModel.setQuickTest30Seconds() }
+                onQuick10sRealTest = { viewModel.setQuickRealTest10Seconds() }
             )
 
             // Live State / Countdown Card
             LiveStatusCard(
                 isServiceRunning = isServiceRunning,
                 isScreenOff = isScreenOff,
-                isSimulationMode = isSimulationMode,
                 remainingTimeMillis = remainingTimeMillis,
                 configuredHours = hours,
                 configuredMinutes = minutes,
@@ -495,121 +483,15 @@ private fun MainSwitchCard(
     }
 }
 
-@Composable
-private fun SimulationModeCard(
-    isSimulationMode: Boolean,
-    onToggleSimulation: (Boolean) -> Unit,
-    onRun10sRealTest: () -> Unit,
-    onRun30sTest: () -> Unit
-) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSimulationMode) AccentAmber.copy(alpha = 0.12f) else DarkSurface
-        ),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                1.dp,
-                if (isSimulationMode) AccentAmber.copy(alpha = 0.5f) else DarkSurfaceVariant,
-                RoundedCornerShape(20.dp)
-            )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = if (isSimulationMode) AccentAmber else AccentCyan
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Column {
-                        Text(
-                            text = "Simulation / Test Mode",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = TextPrimary,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = if (isSimulationMode) "Safe dry-run enabled (No real shutdown)" else "Real shutdown on timeout",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (isSimulationMode) AccentAmber else TextSecondary
-                        )
-                    }
-                }
-
-                Switch(
-                    checked = isSimulationMode,
-                    onCheckedChange = onToggleSimulation,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = AccentAmber,
-                        uncheckedThumbColor = TextMuted,
-                        uncheckedTrackColor = DarkSurfaceVariant
-                    )
-                )
-            }
-
-            Text(
-                text = "When Simulation Mode is enabled, if the screen turns off and timer reaches 0, the app triggers a test notification and log event instead of physically shutting down the device. Perfect for testing without root or without powering off your device!",
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
-                fontSize = 12.sp,
-                lineHeight = 16.sp
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Button(
-                    onClick = onRun10sRealTest,
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentRed),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.PowerSettingsNew, contentDescription = null, tint = Color.White)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("🔥 10s Real Test", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                }
-
-                Button(
-                    onClick = onRun30sTest,
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentAmber),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.HourglassBottom, contentDescription = null, tint = DarkBackground)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("⚡ 30s Sim Test", color = DarkBackground, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                }
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TimeConfigurationCard(
     hours: Int,
     minutes: Int,
     seconds: Int,
-    isSimulationMode: Boolean,
     onHoursChanged: (Int) -> Unit,
     onMinutesChanged: (Int) -> Unit,
-    onQuick10sRealTest: () -> Unit,
-    onQuick30sTest: () -> Unit
+    onQuick10sRealTest: () -> Unit
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
@@ -677,16 +559,10 @@ private fun TimeConfigurationCard(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 PresetChip(
-                    label = "🔥 10s (Real)",
-                    isSelected = hours == 0 && minutes == 0 && seconds == 10 && !isSimulationMode
+                    label = "10s (Test)",
+                    isSelected = hours == 0 && minutes == 0 && seconds == 10
                 ) {
                     onQuick10sRealTest()
-                }
-                PresetChip(
-                    label = "⚡ 30s (Sim)",
-                    isSelected = hours == 0 && minutes == 0 && seconds == 30 && isSimulationMode
-                ) {
-                    onQuick30sTest()
                 }
                 PresetChip(label = "15m", isSelected = hours == 0 && minutes == 15 && seconds == 0) {
                     onHoursChanged(0)
@@ -826,7 +702,6 @@ private fun PresetChip(
 private fun LiveStatusCard(
     isServiceRunning: Boolean,
     isScreenOff: Boolean,
-    isSimulationMode: Boolean,
     remainingTimeMillis: Long?,
     configuredHours: Int,
     configuredMinutes: Int,
@@ -855,22 +730,6 @@ private fun LiveStatusCard(
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold
                     )
-                }
-
-                if (isSimulationMode) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(AccentAmber.copy(alpha = 0.2f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "SIMULATION",
-                            color = AccentAmber,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
                 }
             }
 
@@ -911,7 +770,7 @@ private fun LiveStatusCard(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = if (isSimulationMode) "SIMULATING SHUTDOWN IN" else "SHUTTING DOWN IN",
+                                text = "SHUTTING DOWN IN",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = AccentAmber,
