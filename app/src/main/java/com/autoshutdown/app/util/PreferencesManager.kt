@@ -24,6 +24,11 @@ class PreferencesManager(private val context: Context) {
         val KEY_SIMULATION_MODE = booleanPreferencesKey("simulation_mode")
         val KEY_TARGET_SHUTDOWN_MILLIS = longPreferencesKey("target_shutdown_millis")
         val KEY_SCREEN_OFF_TIMESTAMP = longPreferencesKey("screen_off_timestamp")
+        val KEY_DISMISSED_OEM_ADVICE = booleanPreferencesKey("dismissed_oem_advice")
+    }
+
+    val isOemAdviceDismissedFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[KEY_DISMISSED_OEM_ADVICE] ?: false
     }
 
     val hoursFlow: Flow<Int> = context.dataStore.data.map { preferences ->
@@ -97,6 +102,12 @@ class PreferencesManager(private val context: Context) {
     suspend fun setTargetShutdownMillis(targetMillis: Long) {
         context.dataStore.edit { preferences ->
             preferences[KEY_TARGET_SHUTDOWN_MILLIS] = targetMillis
+        }
+    }
+
+    suspend fun setOemAdviceDismissed(dismissed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_DISMISSED_OEM_ADVICE] = dismissed
         }
     }
 

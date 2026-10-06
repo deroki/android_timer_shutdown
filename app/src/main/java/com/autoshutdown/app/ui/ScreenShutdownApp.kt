@@ -110,6 +110,8 @@ fun ScreenShutdownApp(
     val rootStatus by viewModel.rootStatus.collectAsState()
     val isAccessibilityEnabled by viewModel.isAccessibilityEnabled.collectAsState()
     val actionMessage by viewModel.actionMessage.collectAsState()
+    val oemAdvice by viewModel.oemAdvice.collectAsState()
+    val isOemAdviceDismissed by viewModel.isOemAdviceDismissed.collectAsState()
 
     var showTestShutdownDialog by remember { mutableStateOf(false) }
 
@@ -142,6 +144,19 @@ fun ScreenShutdownApp(
                 onOpenAccessibility = { openAccessibilitySettings(context) },
                 onRecheck = { viewModel.checkPermissions() }
             )
+
+            // OEM Security Guidance Banner (Samsung PIN lock prevention)
+            if (oemAdvice != null && !isOemAdviceDismissed) {
+                OemAdviceCard(
+                    advice = oemAdvice!!,
+                    onOpenSettings = {
+                        com.autoshutdown.app.util.OemSecurityAdvisor.openLockScreenSettings(context)
+                    },
+                    onDismiss = {
+                        viewModel.dismissOemAdvice()
+                    }
+                )
+            }
 
             // Main Service Activation Switch Card
             MainSwitchCard(
@@ -195,7 +210,10 @@ fun ScreenShutdownApp(
                 autoStartOnBoot = autoStartOnBoot,
                 onAutoStartToggle = { viewModel.setAutoStartOnBoot(it) },
                 onIgnoreBatteryOptimization = { openBatteryOptimizationSettings(context) },
-                onTestShutdownClick = { showTestShutdownDialog = true }
+                onTestShutdownClick = { showTestShutdownDialog = true },
+                hasOemAdvice = oemAdvice != null,
+                isOemAdviceDismissed = isOemAdviceDismissed,
+                onRestoreOemAdvice = { viewModel.restoreOemAdvice() }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -940,7 +958,10 @@ private fun SettingsAndPermissionsSection(
     autoStartOnBoot: Boolean,
     onAutoStartToggle: (Boolean) -> Unit,
     onIgnoreBatteryOptimization: () -> Unit,
-    onTestShutdownClick: () -> Unit
+    onTestShutdownClick: () -> Unit,
+    hasOemAdvice: Boolean = false,
+    isOemAdviceDismissed: Boolean = false,
+    onRestoreOemAdvice: () -> Unit = {}
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
@@ -1004,6 +1025,22 @@ private fun SettingsAndPermissionsSection(
                 Text("Disable Battery Restrictions", color = TextPrimary)
             }
 
+            // Re-show OEM advice if dismissed
+            if (hasOemAdvice && isOemAdviceDismissed) {
+                OutlinedButton(
+                    onClick = onRestoreOemAdvice,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AccentAmber),
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                        brush = androidx.compose.ui.graphics.SolidColor(AccentAmber.copy(alpha = 0.5f))
+                    )
+                ) {
+                    Icon(Icons.Default.Warning, contentDescription = null, tint = AccentAmber)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Show Lock Screen PIN Advisory", color = AccentAmber)
+                }
+            }
+
             // Test Shutdown Button
             OutlinedButton(
                 onClick = onTestShutdownClick,
@@ -1014,6 +1051,130 @@ private fun SettingsAndPermissionsSection(
                 Icon(Icons.Default.PowerSettingsNew, contentDescription = null, tint = AccentRed)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Test Immediate Shutdown (Root)", color = AccentRed)
+            }
+        }
+    }
+}
+
+@Composable
+private fun OemAdviceCard(
+    advice: com.autoshutdown.app.util.OemAdvice,
+    onOpenSettings: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, AccentAmber.copy(alpha = 0.5f)),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            // Header: Warning Icon + Brand Badge + Title
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(AccentAmber.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = AccentAmber,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = advice.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = advice.brand,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AccentAmber,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            // Description
+            Text(
+                text = advice.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondary
+            )
+
+            // Step List
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(DarkSurfaceVariant.copy(alpha = 0.6f))
+                    .padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                advice.steps.forEachIndexed { index, step ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(22.dp)
+                                .clip(CircleShape)
+                                .background(AccentAmber.copy(alpha = 0.25f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "${index + 1}",
+                                color = AccentAmber,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = step,
+                            color = TextPrimary,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+                }
+            }
+
+            // Actions: Open Settings & Dismiss
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Button(
+                    onClick = onOpenSettings,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = AccentAmber),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text(advice.settingsActionLabel, color = Color.Black, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                }
+
+                OutlinedButton(
+                    onClick = onDismiss,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary)
+                ) {
+                    Text("Dismiss", fontSize = 12.sp)
+                }
             }
         }
     }

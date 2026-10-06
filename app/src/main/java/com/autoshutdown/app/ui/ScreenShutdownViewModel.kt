@@ -44,6 +44,12 @@ class ScreenShutdownViewModel(application: Application) : AndroidViewModel(appli
     val isScreenOff: StateFlow<Boolean> = ScreenMonitorService.isScreenOff
     val remainingTimeMillis: StateFlow<Long?> = ScreenMonitorService.remainingTimeMillis
 
+    val isOemAdviceDismissed: StateFlow<Boolean> = preferencesManager.isOemAdviceDismissedFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    private val _oemAdvice = MutableStateFlow<com.autoshutdown.app.util.OemAdvice?>(null)
+    val oemAdvice: StateFlow<com.autoshutdown.app.util.OemAdvice?> = _oemAdvice.asStateFlow()
+
     private val _rootStatus = MutableStateFlow(ShutdownManager.RootStatus.UNKNOWN)
     val rootStatus: StateFlow<ShutdownManager.RootStatus> = _rootStatus.asStateFlow()
 
@@ -62,6 +68,19 @@ class ScreenShutdownViewModel(application: Application) : AndroidViewModel(appli
             val hasRoot = ShutdownManager.isRootAvailable()
             _rootStatus.value = if (hasRoot) ShutdownManager.RootStatus.AVAILABLE else ShutdownManager.RootStatus.NOT_AVAILABLE
             _isAccessibilityEnabled.value = ShutdownManager.isAccessibilityEnabled()
+            _oemAdvice.value = com.autoshutdown.app.util.OemSecurityAdvisor.getAdvice(context)
+        }
+    }
+
+    fun dismissOemAdvice() {
+        viewModelScope.launch {
+            preferencesManager.setOemAdviceDismissed(true)
+        }
+    }
+
+    fun restoreOemAdvice() {
+        viewModelScope.launch {
+            preferencesManager.setOemAdviceDismissed(false)
         }
     }
 
