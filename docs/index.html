@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screen Idle Shutdown — Automatic Android Poweroff</title>
+  <meta name="description" content="Android application that automatically shuts down your device when the screen remains off for a configured duration. Standalone, non-root & root support.">
+  <meta name="theme-color" content="#0b0f19">
+  
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <div class="container">
+    <!-- Navbar -->
+    <header class="navbar">
+      <a href="#" class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#38bdf8">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+        </div>
+        <span class="brand-title">Screen Idle Shutdown</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how-it-works" class="nav-link">Guide</a>
+        <a href="#releases" class="nav-link">Releases</a>
+        <a href="https://github.com/deroki/android_timer_shutdown" target="_blank" rel="noopener noreferrer" class="github-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+      <section class="hero">
+        <div class="tag-badge">
+          <span class="tag-pulse"></span>
+          <span>Latest Release: <strong id="hero-tag-badge">v1.0.0</strong></span>
+        </div>
+
+        <h1 class="hero-title">
+          Smart Auto Power-Off for <span class="gradient-text">Android</span>
+        </h1>
+        
+        <p class="hero-subtitle">
+          Automatically shuts down your phone or tablet when left unused with the screen off.
+          Saves battery, stops overnight drain, and preserves your device lifespan.
+        </p>
+
+        <!-- Download Card -->
+        <div class="download-card-wrapper">
+          <div class="download-card">
+            <div class="download-info">
+              <h3>Get the App for Android</h3>
+              <p>Direct APK installation. Fully signed, non-root automated shutdown via Accessibility.</p>
+
+              <div class="download-meta">
+                <div class="meta-item">
+                  <span>Tag:</span>
+                  <strong id="meta-version">v1.0.0</strong>
+                </div>
+                <div class="meta-item">
+                  <span>Size:</span>
+                  <strong id="meta-size">~11.2 MB</strong>
+                </div>
+                <div class="meta-item">
+                  <span>Updated:</span>
+                  <strong id="meta-date">Latest</strong>
+                </div>
+              </div>
+
+              <a id="primary-download-btn" href="https://github.com/deroki/android_timer_shutdown/releases" class="btn-primary">
+                <svg width="22" height="22" viewBox="0 0 24 24">
+                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+                </svg>
+                <span>Download APK <span id="btn-tag-label">(v1.0.0)</span></span>
+              </a>
+
+              <div class="download-subtext">
+                Target: <span id="meta-filename">ScreenIdleShutdown-v1.0.0.apk</span> &bull; Android 8.0+
+              </div>
+            </div>
+
+            <!-- QR Code on Desktop -->
+            <div class="qr-container">
+              <div class="qr-box" id="qrcode"></div>
+              <div class="qr-title">Scan from your Phone</div>
+              <div class="qr-desc">Scan with your phone camera to download directly to your mobile device</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3-Step Phone Installation Guide -->
+      <section id="how-it-works" class="steps-section">
+        <div class="section-header">
+          <h2>How to Install on Your Device</h2>
+          <p>Get up and running in less than 60 seconds</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <span class="step-number">01</span>
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+              </svg>
+            </div>
+            <h3>1. Download the APK</h3>
+            <p>Tap the <strong>Download APK</strong> button on your phone or scan the QR code from another screen.</p>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">02</span>
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+              </svg>
+            </div>
+            <h3>2. Allow & Install</h3>
+            <p>Open the downloaded file. When prompted, tap <em>Settings</em> and toggle <em>Allow from this source</em> to proceed.</p>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">03</span>
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            <h3>3. Configure & Enable</h3>
+            <p>Open the app, set your idle countdown duration, enable the Monitoring switch and grant Accessibility permissions.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section id="features" class="features-section">
+        <div class="section-header">
+          <h2>Key Features</h2>
+          <p>Engineered for high reliability, zero bloat, and battery conservation</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+              </svg>
+            </div>
+            <h3>100% Standalone (No Root)</h3>
+            <p>Uses an automated Accessibility Service to open the system power menu and power down cleanly. No computer, Shizuku, or companion app needed.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
+              </svg>
+            </div>
+            <h3>Superuser Root Acceleration</h3>
+            <p>Automatically detects root access. If your device is rooted, it triggers instant hardware power-off via superuser shell command.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+              </svg>
+            </div>
+            <h3>Doze-Proof AlarmManager</h3>
+            <p>Schedules exact alarms with <code>setExactAndAllowWhileIdle</code> to guarantee wakeup and shutdown even when Android is in deep battery saver Doze mode.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+              </svg>
+            </div>
+            <h3>Automatic Reset on Screen On</h3>
+            <p>Picking up and turning on the screen immediately cancels the shutdown timer, ensuring seamless everyday usability without interruption.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+              </svg>
+            </div>
+            <h3>OEM Security Advisor</h3>
+            <p>Built-in intelligence to detect manufacturer-specific lock screen PIN restrictions on Samsung One UI and Xiaomi MIUI/HyperOS.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+              </svg>
+            </div>
+            <h3>Auto-Start on Boot</h3>
+            <p>Restores screen idle monitoring automatically after device reboot via <code>RECEIVE_BOOT_COMPLETED</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Releases & Tag Details Section -->
+      <section id="releases" class="releases-section">
+        <div class="section-header">
+          <h2>Release & Tag Information</h2>
+          <p>Every APK build is tied directly to a verified Git tag</p>
+        </div>
+
+        <div class="release-box">
+          <div class="release-header">
+            <div class="release-tag-title">
+              <h3 id="release-current-tag">v1.0.0</h3>
+              <span class="release-tag-pill">Latest Tag</span>
+            </div>
+            <div class="release-date" id="release-current-date">October 2026</div>
+          </div>
+          <div class="release-notes" id="release-current-notes">
+Loading release details...
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-links">
+        <a href="https://github.com/deroki/android_timer_shutdown" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub Repository</a>
+        <a href="https://github.com/deroki/android_timer_shutdown/releases" target="_blank" rel="noopener noreferrer" class="footer-link">All Releases</a>
+        <a href="https://github.com/deroki/android_timer_shutdown/issues" target="_blank" rel="noopener noreferrer" class="footer-link">Issue Tracker</a>
+        <a href="https://www.gnu.org/licenses/gpl-3.0" target="_blank" rel="noopener noreferrer" class="footer-link">GPL-3.0 License</a>
+      </div>
+      <p>&copy; 2026 deroki. Free & Open Source Software under GNU General Public License v3.0.</p>
+    </footer>
+  </div>
+
+  <script src="qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

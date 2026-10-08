@@ -1,0 +1,78 @@
+name: Build & Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for the release (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Signed APK & Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Determine Release Tag
+        id: get_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Prepare APK Asset
+        run: |
+          TAG="${{ steps.get_tag.outputs.TAG }}"
+          mkdir -p build-artifacts
+          cp app/build/outputs/apk/release/app-release.apk build-artifacts/ScreenIdleShutdown-${TAG}.apk
+          echo "APK ready at build-artifacts/ScreenIdleShutdown-${TAG}.apk"
+
+      - name: Create GitHub Release and Upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_tag.outputs.TAG }}
+          name: "Screen Idle Shutdown ${{ steps.get_tag.outputs.TAG }}"
+          body: |
+            ## 📱 Screen Idle Shutdown - Release ${{ steps.get_tag.outputs.TAG }}
+
+            ### ✨ What's Included:
+            - **Signed APK**: Direct installation on Android 8.0+ devices
+            - **Autonomous Screen Idle Shutdown**: No root or Shizuku required (Accessibility automation)
+            - **Superuser Root Support**: Instant hardware shutdown for rooted devices
+            - **Exact Alarm Wakeup**: Doze mode reliability via AlarmManager
+            - **Samsung & OEM Advisor**: Lock screen security detection
+
+            ### 📲 Installation:
+            1. Download `ScreenIdleShutdown-${{ steps.get_tag.outputs.TAG }}.apk` below directly to your phone.
+            2. Tap the downloaded file to install (allow "Install unknown apps" if prompted).
+            3. Open the app, set your desired idle timer, and enable Accessibility / monitoring.
+          files: |
+            build-artifacts/ScreenIdleShutdown-${{ steps.get_tag.outputs.TAG }}.apk
+          draft: false
+          prerelease: false

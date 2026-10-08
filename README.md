@@ -1,7 +1,11 @@
 # Screen Idle Shutdown (Android App)
 
+[![Website](https://img.shields.io/badge/Website-GitHub%20Pages-38bdf8?logo=github)](https://deroki.github.io/android_timer_shutdown/)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(v1.0.0)-10b981?logo=android)](https://deroki.github.io/android_timer_shutdown/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0+-green.svg)](https://developer.android.com)
+
+> 🌐 **App Website & Direct APK Download**: [https://deroki.github.io/android_timer_shutdown/](https://deroki.github.io/android_timer_shutdown/)
 
 An Android application that continuously monitors the device's screen state. When the display turns off, it automatically starts a countdown timer. If the screen remains off for the duration configured in the UI (hours, minutes, seconds), it automatically powers down / shuts off the device to prevent battery drain when left unused.
 
